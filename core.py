@@ -1,24 +1,29 @@
 import time
 
+DEFAULT_TTL = 60  # Default time-to-live in seconds
+
 class RedisCore:
     def __init__(self):
-        self.store = {}
-        self.expirations = {}
-        
-    def set(self, key, value):
-        """set the value for the given key"""
+        self.store = {}  # Main key-value store
+        self.expirations = {}  # Store expiration times for keys
+
+    def set(self, key, value, ttl=None):
+        """Set a value for a given key with optional expiration"""
         self.store[key] = value
+        if ttl is None:
+            ttl = DEFAULT_TTL  # Use default TTL if none provided
         if key in self.expirations:
-            del self.expirations[key]
-        return "Ok"
-    
+            del self.expirations[key]  # Remove old expiration if re-assigning key
+        self.expirations[key] = time.time() + ttl
+        return "OK"
+
     def get(self, key):
         """Get the value of a key, or return None if expired or doesn't exist"""
         if self.is_expired(key):
             self.del_key(key)
             return None
         return self.store.get(key, None)
-    
+
     def del_key(self, key):
         """Delete a key from the store"""
         if key in self.store:
