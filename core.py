@@ -8,8 +8,8 @@ class RedisCore:
     def set(self, key, value):
         """set the value for the given key"""
         self.store[key] = value
-        if key in self.exipirations:
-            del self.expirataions[key]
+        if key in self.expirations:
+            del self.expirations[key]
         return "Ok"
     
     def get(self, key):
